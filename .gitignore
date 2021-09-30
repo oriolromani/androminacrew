@@ -1,0 +1,10 @@
+.vscode
+.DS_Store
+db.sqlite*
+*.pyc
+.idea
+.env
+*.dump
+.coverage
+htmlcov
+staticfiles

@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Task, UserTask, WorkTime
+
+admin.site.register(Task)
+admin.site.register(UserTask)
+admin.site.register(WorkTime)
