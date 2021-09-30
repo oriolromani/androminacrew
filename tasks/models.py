@@ -19,10 +19,13 @@ class UserTask(models.Model):
     )
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="workers")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_tasks")
-    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES)
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
 
     class Meta:
         unique_together = ["task", "user"]
+
+    def __str__(self) -> str:
+        return " | ".join([self.task.name, self.user.username])
 
 
 class WorkTime(models.Model):
