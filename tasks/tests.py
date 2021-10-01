@@ -3,25 +3,28 @@ import pytz
 import json
 
 from django.urls import reverse
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
 
 from tasks.models import Task
-from users.models import Company
+from users.models import Company, CustomUser
 from tasks.views import TaskList, CreateUserTask
 
 
 class TasksTests(APITestCase):
     def setUp(self) -> None:
         self.factory = APIRequestFactory()
-        self.company_user = User.objects.create(username="company_user")
+        self.company_user = CustomUser.objects.create(
+            username="company_user", email="company@company.com"
+        )
         self.company = Company.objects.create(
             user=self.company_user, name="test_company"
         )
-        self.admin_user = User.objects.create(username="admin")
+        self.admin_user = CustomUser.objects.create(
+            username="admin", email="admin@androminacrew.com"
+        )
         self.admin_user.is_staff = True
         self.admin_user.save()
         self.task_1 = Task.objects.create(
@@ -30,7 +33,9 @@ class TasksTests(APITestCase):
             start_time=datetime.now(tz=pytz.UTC) + timedelta(days=1),
             end_time=datetime.now(tz=pytz.UTC) + timedelta(days=2),
         )
-        self.user = User.objects.create(username="test")
+        self.user = CustomUser.objects.create(
+            username="test", email="test@whatever.com"
+        )
 
     def test_list_tasks(self):
         """
@@ -100,7 +105,7 @@ class TasksTests(APITestCase):
         Normal user shouldn't be able to create a UserTask
         """
         view = CreateUserTask.as_view()
-        normal_user = User.objects.create(username="normal")
+        normal_user = CustomUser.objects.create(username="normal")
         url = reverse("user_tasks")
         data = {"user_id": self.user.id, "task_id": self.task_1.id}
         request = self.factory.post(url, data)

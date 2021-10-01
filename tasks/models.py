@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-
-from users.models import Company
+from users.models import Company, CustomUser
 
 
 class Task(models.Model):
@@ -9,6 +7,9 @@ class Task(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
 
 
 class UserTask(models.Model):
@@ -18,18 +19,20 @@ class UserTask(models.Model):
         (3, "rejected"),
     )
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="workers")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_tasks")
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="user_tasks"
+    )
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
 
     class Meta:
         unique_together = ["task", "user"]
 
-    def __str__(self) -> str:
+    def __str__(self):
         return " | ".join([self.task.name, self.user.username])
 
 
 class WorkTime(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

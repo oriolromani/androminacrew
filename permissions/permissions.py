@@ -7,4 +7,4 @@ class CompanyUserPermission(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return hasattr(request.user, "company")
+        return request.user.is_company
