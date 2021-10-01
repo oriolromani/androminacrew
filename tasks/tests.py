@@ -14,7 +14,7 @@ from tasks.views import TaskList, CreateUserTask
 
 
 class TasksTests(APITestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.factory = APIRequestFactory()
         self.company_user = CustomUser.objects.create(
             username="company_user", email="company@company.com"

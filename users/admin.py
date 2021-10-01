@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Company, CustomUser
+from .models import Company, CustomUser, Invitation
 
 admin.site.register(Company)
 
@@ -10,3 +10,10 @@ class UserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CustomUser, UserAdmin)
+
+
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ("company", "user", "status", "created")
+
+
+admin.site.register(Invitation, InvitationAdmin)
