@@ -34,5 +34,6 @@ class UserTask(models.Model):
 class WorkTime(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user_task = models.ForeignKey(
+        UserTask, on_delete=models.CASCADE, related_name="times"
+    )

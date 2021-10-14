@@ -14,8 +14,9 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
     is_company = models.BooleanField(default=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "uuid"
 
 
 class Company(models.Model):
@@ -24,11 +25,6 @@ class Company(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 
 class Invitation(models.Model):
@@ -50,17 +46,6 @@ class Invitation(models.Model):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-
-@receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 @receiver(post_save, sender=Company)
