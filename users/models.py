@@ -14,9 +14,12 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
     is_company = models.BooleanField(default=False)
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    USERNAME_FIELD = "uuid"
+    uid = models.CharField(
+        primary_key=True,
+        default=uuid.uuid4().hex[:6].upper(),
+        max_length=6,
+        unique=True,
+    )
 
 
 class Company(models.Model):
