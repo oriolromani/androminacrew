@@ -107,7 +107,7 @@ class TasksTests(APITestCase):
         view = CreateUserTask.as_view()
         normal_user = CustomUser.objects.create(username="normal")
         url = reverse("user_tasks")
-        data = {"user": self.user.uuid, "task_id": self.task_1.id}
+        data = {"user": self.user.uid, "task_id": self.task_1.id}
         request = self.factory.post(url, data)
         force_authenticate(request, user=normal_user, token=normal_user.auth_token)
         response = view(request)
@@ -120,7 +120,7 @@ class TasksTests(APITestCase):
         """
         view = CreateUserTask.as_view()
         url = reverse("user_tasks")
-        data = {"user": self.user.uuid, "task": self.task_1.id}
+        data = {"user": self.user.uid, "task": self.task_1.id}
         request = self.factory.post(url, data)
         force_authenticate(
             request, user=self.company_user, token=self.company_user.auth_token

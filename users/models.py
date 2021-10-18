@@ -7,6 +7,10 @@ from django.db.models.signals import post_save
 from rest_framework.authtoken.models import Token
 
 
+def get_default_uid():
+    return uuid.uuid4().hex[:6].upper()
+
+
 class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField("email_address", unique=True)
@@ -16,7 +20,7 @@ class CustomUser(AbstractUser):
     is_company = models.BooleanField(default=False)
     uid = models.CharField(
         primary_key=True,
-        default=uuid.uuid4().hex[:6].upper(),
+        default=get_default_uid,
         max_length=6,
         unique=True,
     )
