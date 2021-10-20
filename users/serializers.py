@@ -6,7 +6,7 @@ from .models import CustomUser, Invitation
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = "__all__"
+        fields = ["username", "first_name", "last_name", "email", "uid"]
 
 
 class InvitationSerializer(serializers.ModelSerializer):
