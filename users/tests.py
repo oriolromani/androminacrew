@@ -44,7 +44,6 @@ class UsersTests(APITestCase):
         data = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), 1)  # only one user is returned
-        self.assertFalse(data[0]["is_company"])
         self.assertEqual(data[0]["username"], self.user.username)
 
     def test_confirmed_company_users(self):
