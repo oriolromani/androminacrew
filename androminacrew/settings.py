@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
 }
 
@@ -139,3 +140,5 @@ AUTH_USER_MODEL = "users.CustomUser"
 # Static files
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
+
+LOGIN_REDIRECT_URL = "user_detail"
