@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
 
-from tasks.models import Task
+from tasks.models import Task, UserTask
 from users.models import Company, CustomUser
 from tasks.views import TaskList, CreateUserTask
 
@@ -71,6 +71,12 @@ class TasksTests(APITestCase):
         response.render()
         data = json.loads(response.content)
         self.assertEqual(len(data), 0)
+
+        _ = UserTask.objects.create(user=self.user, task=self.task_1)
+        response = view(request)
+        response.render()
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 1)
 
     def test_create_task(self):
         """
