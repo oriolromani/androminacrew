@@ -13,7 +13,7 @@ def get_default_uid():
 
 class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField("email_address", unique=True)
+    email = models.EmailField("email_address")
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)

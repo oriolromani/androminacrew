@@ -26,7 +26,7 @@ class TaskList(APIView):
                 company = request.user.company
                 tasks = Task.objects.filter(company=company)
             except AttributeError:
-                tasks = request.user.user_tasks.all()
+                tasks = [user_task.task for user_task in request.user.user_tasks.all()]
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
