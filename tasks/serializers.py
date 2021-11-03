@@ -6,7 +6,7 @@ from .models import Task, UserTask, WorkTime
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["name", "start_time", "end_time"]
+        fields = ["name", "start_time", "end_time", "company", "uid"]
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
