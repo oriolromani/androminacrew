@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
@@ -6,9 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from rest_framework.authtoken.models import Token
 
-
-def get_default_uid():
-    return uuid.uuid4().hex[:6].upper()
+from utils import utils
 
 
 class CustomUser(AbstractUser):
@@ -20,7 +17,7 @@ class CustomUser(AbstractUser):
     is_company = models.BooleanField(default=False)
     uid = models.CharField(
         primary_key=True,
-        default=get_default_uid,
+        default=utils.get_default_uid,
         max_length=6,
         unique=True,
     )

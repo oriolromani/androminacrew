@@ -3,7 +3,6 @@ import pytz
 import json
 
 from django.urls import reverse
-from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
@@ -78,58 +77,83 @@ class TasksTests(APITestCase):
         data = json.loads(response.content)
         self.assertEqual(len(data), 1)
 
-    def test_create_task(self):
+
+class CreateTaskTests(APITestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.company_user = CustomUser.objects.create(
+            username="company_user", email="company@company.com"
+        )
+        self.company = Company.objects.create(
+            user=self.company_user, name="test_company"
+        )
+        self.task_1 = Task.objects.create(
+            company=self.company,
+            name="test",
+            start_time=datetime.now(tz=pytz.UTC) + timedelta(days=1),
+            end_time=datetime.now(tz=pytz.UTC) + timedelta(days=2),
+        )
+        self.user = CustomUser.objects.create(
+            username="test", email="test@whatever.com"
+        )
+
+    def test_create_non_existing_task(self):
         """
-        Company user should be able to create tasks
+        Create a Task with no UserTasks
         """
-        view = TaskList.as_view()
-        url = reverse("tasks")
+        view = CreateUserTask.as_view()
+        url = reverse("user_tasks")
         data = {
-            "name": "task_2",
+            "name": "test2",
             "start_time": datetime.now(tz=pytz.UTC) + timedelta(days=1),
             "end_time": datetime.now(tz=pytz.UTC) + timedelta(days=2),
         }
-        request = self.factory.post(url, data)
-
+        request = self.factory.post(url, data=data)
         force_authenticate(
             request, user=self.company_user, token=self.company_user.auth_token
         )
-        response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Task.objects.count(), 2)
-        self.assertTrue(Task.objects.filter(name="task_2").exists())  # task is created
+        _ = view(request)
+        self.assertTrue(Task.objects.filter(name="test2").exists())
 
-        force_authenticate(request, user=self.user, token=self.user.auth_token)
-        response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(
-            Task.objects.count(), 2
-        )  # same than previous post by a customer user
-
-    def test_create_user_task_by_normal_user(self):
+    def test_create_task_and_usertasks(self):
         """
-        Normal user shouldn't be able to create a UserTask
-        """
-        view = CreateUserTask.as_view()
-        normal_user = CustomUser.objects.create(username="normal")
-        url = reverse("user_tasks")
-        data = {"user": self.user.uid, "task_id": self.task_1.id}
-        request = self.factory.post(url, data)
-        force_authenticate(request, user=normal_user, token=normal_user.auth_token)
-        response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_create_user_task_company_user(self):
-        """
-        Company user should be able to create a UserTask a.k.a. propose
-        a task to a user
+        Create Task and UserTask
         """
         view = CreateUserTask.as_view()
         url = reverse("user_tasks")
-        data = {"user": self.user.uid, "task": self.task_1.id}
-        request = self.factory.post(url, data)
+        data = {
+            "name": "test3",
+            "start_time": datetime.now(tz=pytz.UTC) + timedelta(days=1),
+            "end_time": datetime.now(tz=pytz.UTC) + timedelta(days=2),
+            "users": [self.user.uid],
+        }
+        request = self.factory.post(url, data=data)
         force_authenticate(
             request, user=self.company_user, token=self.company_user.auth_token
         )
-        response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        _ = view(request)
+        self.assertTrue(UserTask.objects.filter(user=self.user).exists())
+
+    def test_create_user_task_on_existing_task(self):
+        """
+        Create UserTask on exising Task
+        """
+        user_2 = CustomUser.objects.create(username="test2", email="test2@whatever.com")
+        tasks_count_pre = Task.objects.count()
+        view = CreateUserTask.as_view()
+        url = reverse("user_tasks")
+        data = {
+            "name": self.task_1.name,
+            "start_time": self.task_1.start_time,
+            "end_time": self.task_1.end_time,
+            "users": [user_2.uid],
+            "uid": self.task_1.uid,
+        }
+        request = self.factory.post(url, data=data)
+        force_authenticate(
+            request, user=self.company_user, token=self.company_user.auth_token
+        )
+        _ = view(request)
+        self.assertTrue(UserTask.objects.filter(user=user_2).exists())
+        # test no new task has been created
+        self.assertEqual(tasks_count_pre, Task.objects.count())

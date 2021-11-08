@@ -2,10 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.contrib.auth import get_user_model
 
 from permissions.permissions import CompanyUserPermission
 from .models import Task
 from .serializers import TaskSerializer, UserTaskSerializer
+
+User = get_user_model()
 
 
 class TaskList(APIView):
@@ -30,28 +33,48 @@ class TaskList(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
-        """
-        Create a Task only if user is a company
-        """
-        if hasattr(request.user, "company"):
-            serializer = TaskSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(company=request.user.company)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response("User is not a company user", status=status.HTTP_403_FORBIDDEN)
-
 
 class CreateUserTask(APIView):
     permission_classes = (IsAuthenticated, CompanyUserPermission)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Create a UserTask. Only available for company users
         """
-        serializer = UserTaskSerializer(data=request.data)
+        create = True
+        data = dict(request.data)
+        data["company"] = request.user.company.id
+        uid = data.get("uid")
+        if uid:
+            try:
+                task = Task.objects.get(uid=uid)
+                create = False
+                data.pop("uid")
+            except Task.DoesNotExist:
+                pass
+
+        serializer = TaskSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if create:
+                task = serializer.save()
+            if "users" in request.data:
+                for user_uid in request.data["users"]:
+                    try:
+                        user_task_serializer = UserTaskSerializer(
+                            data={"task": task.uid, "user": user_uid}
+                        )
+                        if user_task_serializer.is_valid():
+                            user_task_serializer.save()
+                        else:
+                            Response(
+                                user_task_serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST,
+                            )
+                    except User.DoesNotExist:
+                        # TODO: log or communicate a user has not been found
+                        pass
+            if create:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

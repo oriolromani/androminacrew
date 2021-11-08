@@ -1,12 +1,20 @@
 from django.db import models
 from users.models import Company, CustomUser
 
+from utils import utils
+
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    uid = models.CharField(
+        primary_key=True,
+        default=utils.get_default_uid,
+        max_length=6,
+        unique=True,
+    )
 
     def __str__(self):
         return self.name
