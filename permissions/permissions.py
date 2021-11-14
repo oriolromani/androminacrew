@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+COMPANY_METHODS = ["POST", "PATCH", "DELETE"]
+
 
 class CompanyUserPermission(permissions.BasePermission):
     """
@@ -7,4 +9,7 @@ class CompanyUserPermission(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.is_company
+        if request.method in COMPANY_METHODS:
+            return request.user.is_company
+        else:
+            return True
