@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -24,6 +25,11 @@ class BaseTaskView(generics.GenericAPIView):
 class TaskList(BaseTaskView, generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, CompanyUserPermission)
     serializer_class = TaskSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        "start_date": ["gte", "lte", "exact", "gt", "lt"],
+        "status": ["exact"],
+    }
 
     def post(self, request, *args, **kwargs):
         serializer = TaskSerializer(
