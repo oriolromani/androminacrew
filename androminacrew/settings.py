@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework.authtoken",
     "corsheaders",
+    "drf_yasg",
 ]
 
 REST_FRAMEWORK = {
