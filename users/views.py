@@ -6,8 +6,8 @@ from rest_framework.authtoken.models import Token
 
 from permissions.permissions import CompanyUserPermission
 
-from .models import CustomUser, Invitation
-from .serializers import UserSerializer, InvitationSerializer
+from .models import CustomUser
+from .serializers import UserSerializer
 
 
 class UsersList(APIView):
@@ -39,18 +39,6 @@ class UserDetail(APIView):
         serializer = UserSerializer(request.user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-        return Response(serializer.data)
-
-
-class CompanyUsersList(APIView):
-    permission_classes = (IsAuthenticated, CompanyUserPermission)
-
-    def get(self, request, *args, **kwargs):
-        """
-        Get list of invited users
-        """
-        invitations = Invitation.objects.filter(company=request.user.company)
-        serializer = InvitationSerializer(invitations, many=True)
         return Response(serializer.data)
 
 

@@ -11,7 +11,7 @@ class Task(models.Model):
     )
     name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    start_time = models.DateField()
+    start_date = models.DateField()
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tasks")

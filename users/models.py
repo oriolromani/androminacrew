@@ -31,21 +31,6 @@ class Company(models.Model):
         return self.name
 
 
-class Invitation(models.Model):
-    STATUS_CHOICES = (
-        (1, "proposed"),
-        (2, "confirmed"),
-        (3, "rejected"),
-    )
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
-
-    class Meta:
-        unique_together = ["company", "user"]
-
-
 @receiver(post_save, sender=CustomUser)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
