@@ -1,18 +1,12 @@
 from rest_framework import serializers
 
-from .models import Task, UserTask, WorkTime
+from .models import Task, WorkTime
 
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["name", "start_time", "end_time", "company", "uid"]
-
-
-class UserTaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserTask
-        fields = ["task", "user", "status"]
+        fields = "__all__"
 
 
 class WorkTimeSerializer(serializers.ModelSerializer):
