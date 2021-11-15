@@ -1,45 +1,27 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
-from permissions.permissions import CompanyUserPermission
-
 from .models import CustomUser
 from .serializers import UserSerializer
 
 
-class UsersList(APIView):
-    permission_classes = (IsAuthenticated, CompanyUserPermission)
-
-    def get(self, request, *args, **kwargs):
-        """
-        Get list of all users
-        """
-        users = CustomUser.objects.filter(is_company=False)
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
-
-class UserDetail(APIView):
+class UsersList(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
 
-    def get(self, request, *args, **kwargs):
-        """
-        Get detail of the user
-        """
-        serializer = UserSerializer(self.request.user)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return CustomUser.objects.filter(is_company=False)
 
-    def put(self, request, *args, **kwargs):
-        """
-        Update user fields
-        """
-        serializer = UserSerializer(request.user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data)
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return self.request.user
 
 
 class CustomObtainToken(ObtainAuthToken):
