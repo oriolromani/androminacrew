@@ -26,7 +26,7 @@ class TaskSerializer(serializers.ModelSerializer):
             status_choices = {choice[1]: choice[0] for choice in Task.STATUS_CHOICES}
             data["status"] = status_choices[data["status"]]
         except KeyError:
-            raise ValidationError
+            raise ValidationError("Status field is not valid")
         return super().to_internal_value(data)
 
 
