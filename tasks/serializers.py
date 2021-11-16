@@ -1,19 +1,10 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
-
 from .models import Task, WorkTime
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField("_status")
     company = serializers.StringRelatedField()
-
-    @staticmethod
-    def _status(obj):
-        """
-        Return status name instead of id
-        """
-        status_choices = {choice[0]: choice[1] for choice in Task.STATUS_CHOICES}
-        return status_choices[obj.status]
 
     class Meta:
         model = Task
@@ -24,6 +15,19 @@ class TaskSerializer(serializers.ModelSerializer):
         validated_data["company"] = company
         task = Task.objects.create(**validated_data)
         return task
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["status"] = instance.get_status_display()
+        return data
+
+    def to_internal_value(self, data):
+        try:
+            status_choices = {choice[1]: choice[0] for choice in Task.STATUS_CHOICES}
+            data["status"] = status_choices[data["status"]]
+        except KeyError:
+            raise ValidationError
+        return super().to_internal_value(data)
 
 
 class WorkTimeSerializer(serializers.ModelSerializer):
