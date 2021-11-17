@@ -59,6 +59,7 @@ REST_FRAMEWORK = {
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
 }
 
 MIDDLEWARE = [
@@ -163,3 +164,5 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
 )
+
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"

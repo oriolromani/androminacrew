@@ -15,6 +15,8 @@ class Task(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tasks")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
