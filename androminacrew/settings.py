@@ -152,17 +152,18 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
 
 LOGIN_REDIRECT_URL = "user_detail"
 
-# SENTRY
-sentry_sdk.init(
-    dsn="https://231cb521a1ee4e21a57064eb18d1f896@o529502.ingest.sentry.io/6036174",
-    integrations=[DjangoIntegration()],
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True,
-)
+if config("SENTRY_ACTIVE", default=False):
+    # SENTRY
+    sentry_sdk.init(
+        dsn="https://231cb521a1ee4e21a57064eb18d1f896@o529502.ingest.sentry.io/6036174",
+        integrations=[DjangoIntegration()],
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+    )
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
