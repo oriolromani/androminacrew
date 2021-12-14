@@ -26,3 +26,6 @@ class WorkTime(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="times")
+
+    def __str__(self):
+        return f"{self.task.name} {self.pk}"

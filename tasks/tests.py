@@ -7,9 +7,9 @@ from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
 
-from tasks.models import Task
+from tasks.models import Task, WorkTime
 from users.models import Company, CustomUser
-from tasks.views import TaskList
+from tasks.views import TaskList, WorkTimeCreation, WorkTimeDetail
 
 
 class TasksTests(APITestCase):
@@ -70,3 +70,59 @@ class TasksTests(APITestCase):
         response.render()
         data = json.loads(response.content)
         self.assertEqual(len(data), 1)
+
+    def test_task_work_times(self):
+        """
+        Test list work times of a task
+        """
+        work_time = WorkTime.objects.create(
+            task=self.task_1,
+        )
+        view = TaskList.as_view()
+        url = reverse("tasks")
+        request = self.factory.get(url, {})
+
+        # user should see its task work times
+        force_authenticate(request, user=self.user, token=self.user.auth_token)
+        response = view(request)
+        response.render()
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data[0]["times"]), 1)
+        self.assertEqual(
+            data[0]["times"][0]["start_time"],
+            work_time.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+        )
+
+    def test_create_task_work_time(self):
+        """
+        Test create a task work time
+        """
+        view = WorkTimeCreation.as_view()
+        url = reverse("work_time_creation", kwargs={"uid": self.task_1.uid})
+        request = self.factory.post(url, {})
+        force_authenticate(request, user=self.user, token=self.user.auth_token)
+        response = view(request, self.task_1.pk)
+        response.render()
+        data = json.loads(response.content)
+        self.assertTrue(WorkTime.objects.filter(id=data["id"]).exists())
+
+    def test_update_work_time(self):
+        """
+        Test update work time
+        """
+        work_time = WorkTime.objects.create(
+            task=self.task_1,
+        )
+        view = WorkTimeDetail.as_view()
+        url = reverse(
+            "work_time_detail", kwargs={"pk": work_time.pk, "uid": self.task_1}
+        )
+        end_time = datetime.now(tz=pytz.UTC)
+        data = {"end_time": end_time}
+        request = self.factory.put(url, data=data)
+        force_authenticate(request, user=self.user, token=self.user.auth_token)
+        response = view(request, uid=self.task_1.uid, pk=work_time.pk)
+        response.render()
+        data = json.loads(response.content)
+        self.assertEqual(data["end_time"], end_time.strftime("%Y-%m-%d %H:%M:%S"))

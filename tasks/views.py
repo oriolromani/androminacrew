@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from permissions.permissions import CompanyUserPermission
-from .models import Task
-from .serializers import TaskSerializer
+from .models import Task, WorkTime
+from .serializers import TaskSerializer, WorkTimeSerializer
 
 
 class BaseTaskView(generics.GenericAPIView):
@@ -48,3 +48,25 @@ class TaskDetail(BaseTaskView, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
     lookup_field = "uid"
+
+
+class WorkTimeCreation(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = WorkTimeSerializer
+
+    def post(self, request, uid):
+        try:
+            task = Task.objects.get(uid=uid)
+        except Task.ObjectDoesNotExist:
+            Response(f"Task {uid} does not exist", status=status.HTTP_400_BAD_REQUEST)
+        serializer = WorkTimeSerializer(data=request.data, context={"task": task})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WorkTimeDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = WorkTimeSerializer
+    queryset = WorkTime.objects.all()

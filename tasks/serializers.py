@@ -3,8 +3,21 @@ from rest_framework import serializers
 from .models import Task, WorkTime
 
 
+class WorkTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkTime
+        fields = ["id", "start_time", "end_time"]
+
+    def create(self, validated_data):
+        task = self.context.get("task")
+        validated_data["task"] = task
+        work_time = WorkTime.objects.create(**validated_data)
+        return work_time
+
+
 class TaskSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
+    times = WorkTimeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
@@ -17,6 +30,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "user",
             "created_at",
             "updated_at",
+            "times",
         ]
 
     def create(self, validated_data):
@@ -37,9 +51,3 @@ class TaskSerializer(serializers.ModelSerializer):
             if modified_data["status"] not in status_choices.values():
                 modified_data["status"] = status_choices.get(modified_data["status"])
         return super().to_internal_value(modified_data)
-
-
-class WorkTimeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkTime
-        fields = "__all__"
