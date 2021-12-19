@@ -21,6 +21,16 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def time(self):
+        """Sum of the work times of the task"""
+        time = 0
+        for work_time in self.times.filter(end_time__isnull=False):
+            time += int(
+                (work_time.end_time - work_time.start_time).total_seconds() // 60
+            )
+        return time
+
 
 class WorkTime(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
