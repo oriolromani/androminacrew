@@ -31,6 +31,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "times",
+            "time",
         ]
 
     def create(self, validated_data):

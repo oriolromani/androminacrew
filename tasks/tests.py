@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import json
 
@@ -126,3 +126,28 @@ class TasksTests(APITestCase):
         response.render()
         data = json.loads(response.content)
         self.assertEqual(data["end_time"], end_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    def test_task_time(self):
+        """
+        Test sum of work times of a task is correct
+        """
+        task = Task.objects.create(
+            company=self.company,
+            name="test times",
+            start_date=datetime.now(tz=pytz.UTC).date(),
+            user=self.user,
+        )
+        start_time = datetime.now(tz=pytz.UTC)
+        end_time = start_time + timedelta(seconds=361)
+        _ = WorkTime.objects.create(
+            start_time=start_time,
+            end_time=end_time,
+            task=task,
+        )
+        _ = WorkTime.objects.create(
+            start_time=start_time,
+            task=task,
+        )
+        # only first work_time should be considered to compute task time
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(6, task.time)
