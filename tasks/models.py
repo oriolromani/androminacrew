@@ -1,4 +1,5 @@
 import uuid
+from django.utils import timezone
 from django.db import models
 from users.models import Company, CustomUser
 
@@ -33,7 +34,7 @@ class Task(models.Model):
 
 
 class WorkTime(models.Model):
-    start_time = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="times")
 
