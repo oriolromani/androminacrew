@@ -38,6 +38,7 @@ class WorkTime(models.Model):
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="times")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.task.name} {self.pk}"
