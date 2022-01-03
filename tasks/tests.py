@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.core.exceptions import ValidationError
 import pytz
 import json
 
@@ -151,3 +152,44 @@ class TasksTests(APITestCase):
         # only first work_time should be considered to compute task time
         task = Task.objects.get(pk=task.pk)
         self.assertEqual(6, task.time)
+
+    def test_single_non_finished_work_time_in_task(self):
+        """
+        Only one non finished work time can exist in a task
+        """
+        task = Task.objects.create(
+            company=self.company,
+            name="test validation",
+            start_date=datetime.now(tz=pytz.UTC).date(),
+            user=self.user,
+        )
+        start_time = datetime.now(tz=pytz.UTC)
+        _ = WorkTime.objects.create(
+            start_time=start_time,
+            task=task,
+        )
+        self.assertRaises(
+            ValidationError, WorkTime.objects.create, start_time=start_time, task=task
+        )
+
+    def test_work_times_no_overlap(self):
+        """
+        Work times in a task can't overlap in time
+        """
+        task = Task.objects.create(
+            company=self.company,
+            name="test ovarlap validation",
+            start_date=datetime.now(tz=pytz.UTC).date(),
+            user=self.user,
+        )
+        start_time = datetime.now(tz=pytz.UTC)
+        end_time = start_time + timedelta(hours=1)
+        _ = WorkTime.objects.create(start_time=start_time, task=task, end_time=end_time)
+        second_end_time = start_time + timedelta(minutes=30)
+        self.assertRaises(
+            ValidationError,
+            WorkTime.objects.create,
+            start_time=start_time,
+            task=task,
+            end_time=second_end_time,
+        )
