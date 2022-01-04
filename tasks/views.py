@@ -53,6 +53,7 @@ class TaskDetail(BaseTaskView, generics.RetrieveUpdateDestroyAPIView):
 class WorkTimeCreation(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = WorkTimeSerializer
+    queryset = WorkTime.objects.all()
 
     def post(self, request, uid):
         try:

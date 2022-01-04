@@ -1,4 +1,5 @@
 import copy
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import Task, WorkTime
 
@@ -11,7 +12,10 @@ class WorkTimeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         task = self.context.get("task")
         validated_data["task"] = task
-        work_time = WorkTime.objects.create(**validated_data)
+        try:
+            work_time = WorkTime.objects.create(**validated_data)
+        except ValidationError as validation_error:
+            raise serializers.ValidationError(validation_error.args[0])
         return work_time
 
 

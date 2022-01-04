@@ -1,6 +1,7 @@
 import uuid
 from django.utils import timezone
 from django.db import models
+from django.core.exceptions import ValidationError
 from users.models import Company, CustomUser
 
 
@@ -40,3 +41,27 @@ class WorkTime(models.Model):
 
     def __str__(self):
         return f"{self.task.name} {self.pk}"
+
+    def clean(self, *args, **kwargs):
+        """
+        Work times in the same taks can't overlap in time.
+        A work time can't be created on a task if there
+        is a another one which is not finished (a.k.a end_time is null)
+        """
+        if self.task_id is None:
+            raise ValidationError("Task is mandatory")
+        other_work_times = self.task.times.exclude(pk=self.pk)
+        if self.end_time:
+            overlapping_work_times = other_work_times.filter(
+                end_time__gt=self.start_time, start_time__lt=self.end_time
+            )
+            if overlapping_work_times.exists():
+                raise ValidationError("Work times in the same task can't overlap")
+        else:
+            non_finished_work_times = other_work_times.filter(end_time__isnull=True)
+            if non_finished_work_times.exists():
+                raise ValidationError("There are not finished work times in the task")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
