@@ -151,7 +151,7 @@ class TasksTests(APITestCase):
         )
         # only first work_time should be considered to compute task time
         task = Task.objects.get(pk=task.pk)
-        self.assertEqual(6, task.time)
+        self.assertEqual({"hours": 0, "minutes": 6, "seconds": 1}, task.time)
 
     def test_single_non_finished_work_time_in_task(self):
         """
