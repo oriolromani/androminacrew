@@ -25,13 +25,15 @@ class Task(models.Model):
 
     @property
     def time(self):
-        """Sum of the work times of the task"""
-        time = 0
-        for work_time in self.times.filter(end_time__isnull=False):
-            time += int(
-                (work_time.end_time - work_time.start_time).total_seconds() // 60
-            )
-        return time
+        """Sum of the work times of the task, returns in hours, minutes, seconds"""
+        work_times = self.times.filter(end_time__isnull=False)
+        seconds = sum(
+            (work_time.end_time - work_time.start_time).seconds
+            for work_time in work_times
+        )
+        minutes, seconds = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+        return {"hours": hours, "minutes": minutes, "seconds": seconds}
 
 
 class WorkTime(models.Model):
