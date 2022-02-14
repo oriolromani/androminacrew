@@ -21,7 +21,7 @@ class WorkTimeSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
-    times = WorkTimeSerializer(many=True, read_only=True)
+    times = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
@@ -37,6 +37,10 @@ class TaskSerializer(serializers.ModelSerializer):
             "times",
             "time",
         ]
+
+    def get_times(self, instance):
+        times = instance.times.order_by("-start_time")
+        return WorkTimeSerializer(times, many=True).data
 
     def create(self, validated_data):
         company = self.context.get("company")
