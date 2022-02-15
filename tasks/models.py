@@ -1,4 +1,5 @@
 import uuid
+import pytz
 from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -50,6 +51,7 @@ class WorkTime(models.Model):
         Work times in the same taks can't overlap in time.
         A work time can't be created on a task if there
         is a another one which is not finished (a.k.a end_time is null)
+        A WorkTime can't have a start or end time after current time
         """
         if self.task_id is None:
             raise ValidationError("Task is mandatory")
@@ -64,6 +66,12 @@ class WorkTime(models.Model):
             non_finished_work_times = other_work_times.filter(end_time__isnull=True)
             if non_finished_work_times.exists():
                 raise ValidationError("There are not finished work times in the task")
+        current_time = timezone.now()
+        if self.start_time > current_time:
+            raise ValidationError("Start time can't be larger than current time")
+        if self.end_time:
+            if self.end_time > current_time:
+                raise ValidationError("End time can't be larger than current time")
 
     def save(self, *args, **kwargs):
         self.full_clean()

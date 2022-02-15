@@ -135,10 +135,10 @@ class TasksTests(APITestCase):
         task = Task.objects.create(
             company=self.company,
             name="test times",
-            start_date=datetime.now(tz=pytz.UTC).date(),
+            start_date=datetime.now(tz=pytz.UTC).date() - timedelta(hours=1),
             user=self.user,
         )
-        start_time = datetime.now(tz=pytz.UTC)
+        start_time = datetime.now(tz=pytz.UTC) - timedelta(minutes=30)
         end_time = start_time + timedelta(seconds=361)
         _ = WorkTime.objects.create(
             start_time=start_time,
@@ -176,14 +176,15 @@ class TasksTests(APITestCase):
         """
         Work times in a task can't overlap in time
         """
+        current_time = datetime.now(tz=pytz.UTC).date() - timedelta(hours=1)
         task = Task.objects.create(
             company=self.company,
             name="test ovarlap validation",
-            start_date=datetime.now(tz=pytz.UTC).date(),
+            start_date=current_time,
             user=self.user,
         )
-        start_time = datetime.now(tz=pytz.UTC)
-        end_time = start_time + timedelta(hours=1)
+        start_time = datetime.now(tz=pytz.UTC) - timedelta(minutes=30)
+        end_time = start_time + timedelta(minutes=20)
         _ = WorkTime.objects.create(start_time=start_time, task=task, end_time=end_time)
         second_end_time = start_time + timedelta(minutes=30)
         self.assertRaises(
