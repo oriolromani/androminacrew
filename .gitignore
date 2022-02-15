@@ -8,3 +8,4 @@ db.sqlite*
 .coverage
 htmlcov
 staticfiles
+firebase_auth.json
