@@ -1,9 +1,12 @@
 import uuid
-import pytz
 from django.utils import timezone
 from django.db import models
+from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
+from django.dispatch import receiver
+
 from users.models import Company, CustomUser
+from utils.utils import send_message_to_user
 
 
 class Task(models.Model):
@@ -76,3 +79,11 @@ class WorkTime(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+@receiver(post_save, sender=Task)
+def send_message_for_task_create_or_update(sender, instance=None, created=False, **kwargs):
+    if created:
+        message = f"New task from {instance.company.name}"
+    else:
+        message = f"Task {instance.name} from {instance.company.name} has changed"
+    send_message_to_user(instance.user, instance, message)
