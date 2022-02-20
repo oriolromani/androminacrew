@@ -19,6 +19,9 @@ from decouple import config
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from firebase_admin import initialize_app, credentials
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -183,10 +186,14 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 # to create such a variable execute the following to the json file provided by firebase:
 # openssl base64 -in firebase_auth.json -out firebase_auth.txt
 
-firebase_credentials = json.loads(base64.b64decode(config("FIREBASE_CREDENTIALS")))
-certificate = credentials.Certificate(firebase_credentials)
+try:
+    firebase_credentials = json.loads(base64.b64decode(config("FIREBASE_CREDENTIALS")))
+    certificate = credentials.Certificate(firebase_credentials)
+    FIREBASE_APP = initialize_app(credential=certificate)
+except Exception:
+    logger.warning("Firebase APP couldn't be initialised")
+    pass
 
-FIREBASE_APP = initialize_app(credential=certificate)
 # To learn more, visit the docs here:
 # https://cloud.google.com/docs/authentication/getting-started>
 
