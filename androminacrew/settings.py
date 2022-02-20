@@ -11,12 +11,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import base64
+import json
 from pathlib import Path
 import dj_database_url
 from decouple import config
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from firebase_admin import initialize_app
+from firebase_admin import initialize_app, credentials
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -176,7 +178,15 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 # Store an environment variable called GOOGLE_APPLICATION_CREDENTIALS
 # which is a path that point to a json file with your credentials.
 # Additional arguments are available: credentials, options, name
-FIREBASE_APP = initialize_app(credential=config("FIREBASE_CREDENTTIALS"))
+
+# Google Firebase credentials are read from an base64 encoded json file en variable,
+# to create such a variable execute the following to the json file provided by firebase:
+# openssl base64 -in firebase_auth.json -out firebase_auth.txt
+
+firebase_credentials = json.loads(base64.b64decode(config("FIREBASE_CREDENTIALS")))
+certificate = credentials.Certificate(firebase_credentials)
+
+FIREBASE_APP = initialize_app(credential=certificate)
 # To learn more, visit the docs here:
 # https://cloud.google.com/docs/authentication/getting-started>
 
