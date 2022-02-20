@@ -176,7 +176,7 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 # Store an environment variable called GOOGLE_APPLICATION_CREDENTIALS
 # which is a path that point to a json file with your credentials.
 # Additional arguments are available: credentials, options, name
-FIREBASE_APP = initialize_app()
+FIREBASE_APP = initialize_app(credential=config("FIREBASE_CREDENTTIALS"))
 # To learn more, visit the docs here:
 # https://cloud.google.com/docs/authentication/getting-started>
 
