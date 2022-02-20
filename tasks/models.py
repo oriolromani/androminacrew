@@ -86,4 +86,4 @@ def send_message_for_task_create_or_update(sender, instance=None, created=False,
         message = f"New task from {instance.company.name}"
     else:
         message = f"Task {instance.name} from {instance.company.name} has changed"
-    send_message_to_user(instance.user, instance, message)
+    send_message_to_user(instance.user, message)
