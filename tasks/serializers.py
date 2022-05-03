@@ -28,7 +28,7 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = [
             "uid",
             "name",
-            "start_date",
+            "date",
             "status",
             "company",
             "user",

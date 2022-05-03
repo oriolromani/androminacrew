@@ -33,7 +33,7 @@ class TasksTests(APITestCase):
         self.task_1 = Task.objects.create(
             company=self.company,
             name="test",
-            start_date=datetime.now(tz=pytz.UTC).date(),
+            date=datetime.now(tz=pytz.UTC).date(),
             user=self.user,
         )
 
@@ -135,7 +135,7 @@ class TasksTests(APITestCase):
         task = Task.objects.create(
             company=self.company,
             name="test times",
-            start_date=datetime.now(tz=pytz.UTC).date() - timedelta(hours=1),
+            date=datetime.now(tz=pytz.UTC).date() - timedelta(hours=1),
             user=self.user,
         )
         start_time = datetime.now(tz=pytz.UTC) - timedelta(minutes=30)
@@ -160,7 +160,7 @@ class TasksTests(APITestCase):
         task = Task.objects.create(
             company=self.company,
             name="test validation",
-            start_date=datetime.now(tz=pytz.UTC).date(),
+            date=datetime.now(tz=pytz.UTC).date(),
             user=self.user,
         )
         start_time = datetime.now(tz=pytz.UTC)
@@ -180,7 +180,7 @@ class TasksTests(APITestCase):
         task = Task.objects.create(
             company=self.company,
             name="test ovarlap validation",
-            start_date=current_time,
+            date=current_time,
             user=self.user,
         )
         start_time = datetime.now(tz=pytz.UTC) - timedelta(minutes=30)

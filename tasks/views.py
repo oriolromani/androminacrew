@@ -29,10 +29,10 @@ class TaskList(BaseTaskView, generics.ListCreateAPIView):
     serializer_class = TaskSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = {
-        "start_date": ["gte", "lte", "exact", "gt", "lt"],
+        "date": ["gte", "lte", "exact", "gt", "lt"],
         "status": ["exact"],
     }
-    ordering_fields = ["start_date"]
+    ordering_fields = ["date"]
 
     def post(self, request, *args, **kwargs):
         serializer = TaskSerializer(
