@@ -1,3 +1,4 @@
+from pyexpat import model
 import uuid
 from django.utils import timezone
 from django.db import models
@@ -9,17 +10,36 @@ from users.models import Company, CustomUser
 from utils.utils import send_message_to_user
 
 
+class Gig(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    venue = models.CharField(max_length=100, null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+    
+
 class Task(models.Model):
     STATUS_CHOICES = (
         (1, "proposed"),
         (2, "confirmed"),
         (3, "rejected"),
     )
+    WORK_TYPE_CHOICES = (
+        (1, "hours"),
+        (2, "full")
+    )
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    gig = models.ForeignKey(Gig, on_delete=models.CASCADE)
+    allocation_line_uid = models.UUIDField(null=True, blank=True)
+    task_time_type = models.PositiveSmallIntegerField(choices=WORK_TYPE_CHOICES, null=True, blank=True)
+    date = models.DateField()
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
+    pay_per_day = models.PositiveIntegerField(null=True, blank=True)
+    pay_per_hour = models.PositiveIntegerField(null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tasks")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,6 +58,11 @@ class Task(models.Model):
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         return {"hours": hours, "minutes": minutes, "seconds": seconds}
+
+    @property
+    def accepted(self):
+        """Flag that returns if status is confirmed"""
+        return self.status == 2
 
 
 class WorkTime(models.Model):

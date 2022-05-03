@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
@@ -26,6 +27,7 @@ class CustomUser(AbstractUser):
 class Company(models.Model):
     name = models.CharField(max_length=100)
     user = models.OneToOneField(CustomUser, on_delete=models.PROTECT)
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def __str__(self) -> str:
         return self.name
