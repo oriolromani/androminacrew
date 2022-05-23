@@ -1,7 +1,9 @@
 import copy
+from dataclasses import fields
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from .models import Task, WorkTime
+from .models import Gig, Task, WorkTime
+from users.serializers import CompanySerializer
 
 
 class WorkTimeSerializer(serializers.ModelSerializer):
@@ -18,9 +20,16 @@ class WorkTimeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(validation_error.args[0])
         return work_time
 
+class GigSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gig
+        fields = "__all__"
+
 
 class TaskSerializer(serializers.ModelSerializer):
-    company = serializers.StringRelatedField()
+    company = CompanySerializer()
+    gig = GigSerializer()
     times = serializers.SerializerMethodField()
 
     class Meta:
@@ -28,6 +37,7 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = [
             "uid",
             "name",
+            "gig",
             "date",
             "status",
             "company",
