@@ -37,15 +37,21 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = [
             "uid",
             "name",
-            "gig",
-            "date",
-            "status",
             "company",
+            "gig",
+            "allocation_line_uid",
+            "task_time_type",
+            "date",
+            "start_time",
+            "end_time",
+            "status",
+            "pay_per_day",
+            "pay_per_hour",
+            "category",
             "user",
             "created_at",
             "updated_at",
             "times",
-            "time",
         ]
 
     def get_times(self, instance):
