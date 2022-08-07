@@ -28,8 +28,8 @@ class GigSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    company = CompanySerializer()
-    gig = GigSerializer()
+    company = CompanySerializer(read_only=True)
+    gig = GigSerializer(read_only=True)
     times = serializers.SerializerMethodField()
 
     class Meta:
