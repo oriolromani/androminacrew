@@ -59,8 +59,8 @@ class WorkTimeCreation(generics.CreateAPIView):
     def post(self, request, uid):
         try:
             task = Task.objects.get(uid=uid)
-        except Task.ObjectDoesNotExist:
-            Response(f"Task {uid} does not exist", status=status.HTTP_400_BAD_REQUEST)
+        except Task.DoesNotExist:
+            return Response(f"Task {uid} does not exist", status=status.HTTP_400_BAD_REQUEST)
         serializer = WorkTimeSerializer(data=request.data, context={"task": task})
         if serializer.is_valid():
             serializer.save()
