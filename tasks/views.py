@@ -7,8 +7,21 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from permissions.permissions import CompanyUserPermission
-from .models import Task, WorkTime
-from .serializers import TaskSerializer, WorkTimeSerializer
+from .models import Task, WorkTime, Gig
+from .serializers import TaskSerializer, WorkTimeSerializer, GigSerializer
+
+
+class GigListViews(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, CompanyUserPermission)
+    serializer_class = GigSerializer
+    queryset = Gig.objects.all()
+
+
+class GigDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated, CompanyUserPermission)
+    serializer_class = GigSerializer
+    queryset = Gig.objects.all()
+    lookup_field = "uid"
 
 
 class BaseTaskView(generics.GenericAPIView):
