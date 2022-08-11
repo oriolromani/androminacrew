@@ -20,6 +20,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
 
+from tasks import views as task_views
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Andromina-crew API",
@@ -30,12 +32,14 @@ schema_view = get_schema_view(
         license=openapi.License(name="BSD License"),
     ),
     public=True,
-    permission_classes=[permissions.AllowAny],
+    permission_classes=(permissions.AllowAny, ),
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("tasks/", include("tasks.urls")),
+    path("gigs/", task_views.GigListViews.as_view(), name="gigs"),
+    path("gigs/<uid>/", task_views.GigDetailView.as_view(), name="gig"),
     path("users/", include("users.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
