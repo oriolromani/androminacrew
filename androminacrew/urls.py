@@ -38,7 +38,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("tasks/", include("tasks.urls")),
-    path("gigs/", task_views.GigListViews.as_view(), name="gigs"),
+    path("gigs/", task_views.GigListView.as_view(), name="gigs"),
     path("gigs/<uid>/", task_views.GigDetailView.as_view(), name="gig"),
     path("users/", include("users.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
