@@ -11,7 +11,7 @@ from .models import Task, WorkTime, Gig
 from .serializers import TaskSerializer, WorkTimeSerializer, GigSerializer
 
 
-class GigListViews(generics.ListAPIView):
+class GigListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated, CompanyUserPermission)
     serializer_class = GigSerializer
     queryset = Gig.objects.all()
