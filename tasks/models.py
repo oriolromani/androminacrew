@@ -33,7 +33,7 @@ class Task(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    gig = models.ForeignKey(Gig, on_delete=models.CASCADE, null=True, blank=True)
+    gig = models.ForeignKey(Gig, on_delete=models.CASCADE, null=True, blank=True, related_name="tasks")
     allocation_line_uid = models.UUIDField(null=True, blank=True)
     task_time_type = models.PositiveSmallIntegerField(choices=WORK_TYPE_CHOICES, null=True, blank=True)
     date = models.DateField()
