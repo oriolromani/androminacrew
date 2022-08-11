@@ -18,7 +18,7 @@ class GigListView(generics.ListAPIView):
 
 
 class GigDetailView(generics.RetrieveAPIView):
-    permission_classes = (IsAuthenticated, CompanyUserPermission)
+    permission_classes = (IsAuthenticated,)
     serializer_class = GigSerializer
     queryset = Gig.objects.all()
     lookup_field = "uid"
