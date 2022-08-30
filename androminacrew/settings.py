@@ -212,3 +212,5 @@ FCM_DJANGO_SETTINGS = {
     # "Update of device with duplicate registration ID" for more details.
     "UPDATE_ON_DUPLICATE_REG_ID": True,
 }
+
+CORS_ORIGIN_ALLOW_ALL = config("CORS_ORIGIN_ALLOW_ALL", default=False)
