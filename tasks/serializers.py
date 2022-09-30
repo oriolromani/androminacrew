@@ -54,6 +54,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "times",
+            "working_status"
         ]
 
     def get_times(self, instance):
