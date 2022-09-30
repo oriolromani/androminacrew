@@ -33,6 +33,7 @@ class TaskSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
     gig = GigSerializer(read_only=True)
     times = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
@@ -51,11 +52,15 @@ class TaskSerializer(serializers.ModelSerializer):
             "pay_per_hour",
             "category",
             "user",
+            "user_name",
             "created_at",
             "updated_at",
             "times",
             "working_status"
         ]
+
+    def get_user_name(self, instance):
+        return instance.user.username
 
     def get_times(self, instance):
         times = instance.times.order_by("-start_time")
